@@ -99,7 +99,7 @@ function handleMessage(sender_psid, received_message) {
     // Create the payload for a basic text message
     response = {
       // "text": `Your message: "${received_message.text}". Here is your PSID: ${sender_psid}`
-      "text": `Tui không có biết gì hết đừng có nhắn cho tui ^^. Đây là PSID của bạn: ${sender_psid}`
+      "text": `${sender_psid}:Tui không có biết gì hết đừng có nhắn cho tui ^^`
     }
   }  
   
