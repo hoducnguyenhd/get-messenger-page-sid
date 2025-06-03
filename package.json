@@ -17,6 +17,7 @@
     "express": "^4.13.4",
     "dotenv": "*",
     "request": "*"
+    "axios": "*"
   },
   "engines": {
     "node": "18.x"
