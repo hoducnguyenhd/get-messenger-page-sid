@@ -1,32 +1,36 @@
-require('dotenv').config();
+// setup-menu.js
 const axios = require('axios');
 
-const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
+module.exports = async function setupMenu() {
+  const token = process.env.PAGE_ACCESS_TOKEN;
+  const url = `https://graph.facebook.com/v18.0/me/messenger_profile?access_token=${token}`;
 
-const menuData = {
-  persistent_menu: [
-    {
-      locale: "default",
-      composer_input_disabled: false,
-      call_to_actions: [
-        {
-          type: "postback",
-          title: "📋 Xem thời tiết",
-          payload: "XEM_THOI_TIET"
-        },
-        {
-          type: "postback",
-          title: "📋 Lịch vạn niên",
-          payload: "XEM_LICH_VAN_NIEN"
-        },
-        {
-          type: "postback",
-          title: "📋 Điều khiển thiết bị",
-          payload: "DIEU_KHIEN_THIET_BI"
-        }
-      ]
-    }
-  ]
+  const payload = {
+    persistent_menu: [
+      {
+        locale: "default",
+        composer_input_disabled: false,
+        call_to_actions: [
+          {
+            type: "postback",
+            title: "📋 Xem thông tin thời tiết",
+            payload: "WEATHER_INFO"
+          },
+          {
+            type: "postback",
+            title: "📋 Xem lịch vạn niên",
+            payload: "LUNAR_CALENDAR"
+          },
+          {
+            type: "postback",
+            title: "📋 Điều khiển thiết bị",
+            payload: "DEVICE_CONTROL"
+          }
+        ]
+      }
+    ]
+  };
+
+  await axios.post(url, payload);
+  console.log("✅ Menu đã được cập nhật.");
 };
-
-axios.post(`https://graph.facebook.com/v18.0/me/messenger_profile?access_token=$
