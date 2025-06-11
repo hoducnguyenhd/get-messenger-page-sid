@@ -1,12 +1,20 @@
-const axios = require("axios");
-require("dotenv").config();
+const axios = require('axios');
+require('dotenv').config();
+
+const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
 async function setupMenu() {
-  const token = process.env.PAGE_ACCESS_TOKEN;
+  const url = `https://graph.facebook.com/v17.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`;
 
-  const url = `https://graph.facebook.com/v18.0/me/messenger_profile?access_token=${token}`;
+  // Đặt nút "Bắt đầu"
+  await axios.post(url, {
+    get_started: {
+      payload: "GET_STARTED"
+    }
+  });
 
-  const payload = {
+  // Thiết lập menu cố định
+  await axios.post(url, {
     persistent_menu: [
       {
         locale: "default",
@@ -30,15 +38,9 @@ async function setupMenu() {
         ]
       }
     ]
-  };
+  });
 
-  try {
-    const response = await axios.post(url, payload);
-    console.log("✅ Đã thiết lập menu:", response.data);
-  } catch (error) {
-    console.error("❌ Lỗi setup menu:", error.message);
-    console.error("📄 Chi tiết:", error.response?.data);
-  }
+  console.log("✅ Đã thiết lập persistent menu và nút Bắt đầu.");
 }
 
 module.exports = setupMenu;
