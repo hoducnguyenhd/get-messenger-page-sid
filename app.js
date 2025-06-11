@@ -95,3 +95,7 @@ app.post('/webhook', (req, res) => {
 // Khởi chạy server
 const PORT = process.env.PORT || 1337;
 app.listen(PORT, () => console.log(`🚀 Server đang chạy trên cổng ${PORT}`));
+
+const setupMenu = require('./setup-menu');
+setupMenu().catch(err => console.error("❌ Lỗi setup menu:", err.message));
+
