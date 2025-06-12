@@ -18,8 +18,14 @@ async function setupMenu() {
             },
             {
               type: "postback",
+              title: "🔌 Chức năng tuỳ chỉnh",
+              payload: "OPTION"
+            },
+            {
               title: "📅 Xem lịch vạn niên",
-              payload: "XEM_LICH"
+              type: "web_url",
+              url: "https://www.xemlicham.com",
+              webview_height_ratio: "full
             },
             {
               type: "postback",
