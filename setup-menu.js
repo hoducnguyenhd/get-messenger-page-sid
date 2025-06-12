@@ -36,7 +36,7 @@ async function setupMenu() {
               title: "📅 Xem lịch vạn niên",
               type: "web_url",
               url: "https://www.xemlicham.com",
-              webview_height_ratio: "full
+              webview_height_ratio: "full"
             },
             {
               type: "postback",
