@@ -29,7 +29,7 @@ async function setupMenu() {
             {
               title: "📱 Mở Home Assistant",
               type: "web_url",
-              url: "https://434gp.duckdns.org:8123",
+              url: "https://434gp.ddnsfree.com:8123",
               webview_height_ratio: "full"
             }
           ]
