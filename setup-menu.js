@@ -27,18 +27,14 @@ async function setupMenu() {
               payload: "THOI_TIET"
             },
             {
-              type: "web_url",
               title: "📱 Mở Home Assistant",
+              type: "web_url",
               url: process.env.HA_URL,
-              webview_height_ratio: "full",
-              messenger_extensions: false
+              webview_height_ratio: "full"
             }
           ]
         }
-      ],
-      get_started: {
-        payload: "GET_STARTED"
-      }
+      ]
     };
 
     const res = await axios.post(
@@ -46,7 +42,7 @@ async function setupMenu() {
       request_body
     );
 
-    console.log('✅ Đã thiết lập persistent menu và nút Bắt đầu.');
+    console.log('✅ Đã thiết lập persistent menu (không có nút Bắt đầu).');
   } catch (err) {
     console.error('❌ Lỗi setup menu:', err.response?.data || err.message);
   }
