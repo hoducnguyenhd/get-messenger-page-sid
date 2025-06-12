@@ -16,11 +16,11 @@ async function setupMenu() {
               title: "🔌 Điều khiển thiết bị",
               payload: "DIEU_KHIEN"
             },
-            {
+           {
               type: "postback",
               title: "🔌 Chức năng tuỳ chỉnh",
               payload: "OPTION"
-            },
+            },			
             {
               title: "📅 Xem lịch vạn niên",
               type: "web_url",
@@ -40,7 +40,10 @@ async function setupMenu() {
             }
           ]
         }
-      ]
+      ],
+      get_started: {
+        payload: "GET_STARTED"
+      }
     };
 
     const res = await axios.post(
@@ -48,7 +51,7 @@ async function setupMenu() {
       request_body
     );
 
-    console.log('✅ Đã thiết lập persistent menu.');
+    console.log('✅ Đã thiết lập persistent menu và nút Bắt đầu.');
   } catch (err) {
     console.error('❌ Lỗi setup menu:', err.response?.data || err.message);
   }
