@@ -42,7 +42,7 @@ async function setupMenu() {
       request_body
     );
 
-    console.log('✅ Đã thiết lập persistent menu (không có nút Bắt đầu).');
+    console.log('✅ Đã thiết lập persistent menu.');
   } catch (err) {
     console.error('❌ Lỗi setup menu:', err.response?.data || err.message);
   }
