@@ -1,58 +1,63 @@
-// Load các biến môi trường từ file .env
 require('dotenv').config();
 
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
-const setupMenu = require('./setup-menu'); // Import hàm thiết lập menu
 
 const app = express();
 app.use(bodyParser.json());
 
-// Đọc biến môi trường từ .env
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 const HA_WEBHOOK_URL = process.env.HA_WEBHOOK_URL;
 
-// Route kiểm tra kết nối Webhook với Facebook
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
 
-  if (mode && token) {
-    if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-      console.log('✅ Webhook verified');
-      res.status(200).send(challenge);
-    } else {
-      console.warn('❌ Token không hợp lệ');
-      res.sendStatus(403);
-    }
+  if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+    console.log('✅ Webhook verified');
+    res.status(200).send(challenge);
+  } else {
+    res.sendStatus(403);
   }
 });
 
-// Route nhận dữ liệu từ Facebook Messenger
-app.post('/webhook', (req, res) => {
+app.post('/webhook', async (req, res) => {
   const body = req.body;
 
   if (body.object === 'page') {
-    body.entry.forEach((entry) => {
-      const event = entry.messaging[0];
-      const sender_psid = event.sender.id;
-      const message_text = event.message?.text || '[Không phải tin nhắn văn bản]';
+    for (const entry of body.entry) {
+      for (const event of entry.messaging) {
+        const sender_psid = event.sender.id;
 
-      console.log('📩 PSID:', sender_psid);
-      console.log('📝 Tin nhắn:', message_text);
+        // Lọc ra chỉ những event có tin nhắn văn bản hoặc postback
+        const message_text = event.message?.text || null;
+        const payload = event.postback?.payload || null;
+        const action_type = event.postback?.title || null;
 
-      // Gửi toàn bộ payload về Home Assistant
-      axios.post(HA_WEBHOOK_URL, body)
-        .then(response => {
-          console.log('✅ Đã gửi đến Home Assistant:', response.status);
-        })
-        .catch(error => {
-          console.error('❌ Lỗi gửi HA:', error.message);
-        });
-    });
+        if (!message_text && !payload) {
+          console.log(`⚠️ Bỏ qua event không cần thiết từ ${sender_psid}`);
+          continue; // bỏ qua các loại event không quan trọng
+        }
+
+        console.log('📩 PSID:', sender_psid);
+        console.log('📝 Tin nhắn:', message_text || payload);
+
+        try {
+          await axios.post(HA_WEBHOOK_URL, {
+            sender_id: sender_psid,
+            text: message_text,
+            payload: payload,
+            action_type: action_type,
+          });
+          console.log('✅ Đã gửi đến Home Assistant');
+        } catch (err) {
+          console.error('❌ Lỗi gửi HA:', err.message);
+        }
+      }
+    }
 
     res.status(200).send('EVENT_RECEIVED');
   } else {
@@ -60,11 +65,5 @@ app.post('/webhook', (req, res) => {
   }
 });
 
-// Tự động gọi setup menu khi khởi động
-setupMenu().catch(err => {
-  console.error("❌ Lỗi setup menu:", err.message);
-});
-
-// Khởi chạy server
 const PORT = process.env.PORT || 1337;
 app.listen(PORT, () => console.log(`🚀 Server đang chạy trên cổng ${PORT}`));
