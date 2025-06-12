@@ -28,15 +28,9 @@ async function setupMenu() {
             },
             {
               title: "📱 Mở Home Assistant",
-              type: "nested",
-              call_to_actions: [
-                {
-                  title: "Mở Web HA",
-                  type: "web_url",
-                  url: "https://434gp.duckdns.org:8123",
-                  webview_height_ratio: "full"
-                }
-              ]
+              type: "web_url",
+              url: "https://434gp.duckdns.org:8123",
+              webview_height_ratio: "full"
             }
           ]
         }
