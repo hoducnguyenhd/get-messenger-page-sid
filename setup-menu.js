@@ -11,22 +11,11 @@ async function setupMenu() {
           locale: "default",
           composer_input_disabled: false,
           call_to_actions: [
-      {
-        title: "🔌 Điều khiển thiết bị",
-        type: "nested",
-        call_to_actions: [
-          {
-            type: "postback",
-            title: "💡 Bật đèn",
-            payload: "BAT_DEN"
-          },
-          {
-            type: "postback",
-            title: "🔌 Tắt đèn",
-            payload: "TAT_DEN"
-          }
-        ]
-      },
+            {
+              type: "postback",
+              title: "🔌 Điều khiển thiết bị",
+              payload: "DIEU_KHIEN"
+            },
             {
               type: "postback",
               title: "🔌 Chức năng tuỳ chỉnh",
