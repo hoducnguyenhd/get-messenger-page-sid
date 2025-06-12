@@ -27,10 +27,11 @@ async function setupMenu() {
               payload: "THOI_TIET"
             },
             {
-              title: "📱 Mở Home Assistant",
               type: "web_url",
+              title: "📱 Mở Home Assistant",
               url: process.env.HA_URL,
-              webview_height_ratio: "full"
+              webview_height_ratio: "full",
+              messenger_extensions: false
             }
           ]
         }
