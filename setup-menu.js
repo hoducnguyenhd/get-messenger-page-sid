@@ -1,81 +1,64 @@
-// setup-menu.js
+const request = require('request');
 require('dotenv').config();
-const axios = require('axios');
 
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
-async function setupMenu() {
-  const url = `https://graph.facebook.com/v18.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`;
-
-  const payload = {
-    persistent_menu: [
-      {
-        locale: "default",
-        composer_input_disabled: false,
-        call_to_actions: [
-          {
-            title: "🎛 Điều khiển thiết bị",
-            type: "nested",
-            call_to_actions: [
-              {
-                title: "Bật đèn",
-                type: "postback",
-                payload: "BAT_DEN"
-              },
-              {
-                title: "Tắt đèn",
-                type: "postback",
-                payload: "TAT_DEN"
-              },
-              {
-                title: "Mở Quạt",
-                type: "postback",
-                payload: "BAT_QUAT"
-              }
-            ]
-          },
-          {
-            title: "📅 Xem lịch",
-            type: "postback",
-            payload: "XEM_LICH"
-          },
-          {
-            title: "🌤 Thời tiết",
-            type: "postback",
-            payload: "XEM_THOI_TIET"
-          },
-          {
-            title: "📱 Mở Home Assistant",
-            type: "nested",
-            call_to_actions: [
-              {
-                title: "Mở App HA",
-                type: "web_url",
-                url: "homeassistant://navigate/lovelace/default_view",
-                webview_height_ratio: "full"
-              },
-              {
-                title: "Mở Web HA",
-                type: "web_url",
-                url: "https://434gp.ddnsfree.com:8123", 
-                webview_height_ratio: "full"
-              }
-            ]
-          }
-        ]
+function setupMenu() {
+  return new Promise((resolve, reject) => {
+    const request_body = {
+      persistent_menu: [
+        {
+          locale: "default",
+          composer_input_disabled: false,
+          call_to_actions: [
+            {
+              type: "postback",
+              title: "🔌 Điều khiển thiết bị",
+              payload: "DIEU_KHIEN"
+            },
+            {
+              type: "postback",
+              title: "📅 Xem lịch vạn niên",
+              payload: "XEM_LICH"
+            },
+            {
+              type: "postback",
+              title: "🌦️ Thời tiết hiện tại",
+              payload: "THOI_TIET"
+            },
+            {
+              title: "📱 Mở Home Assistant",
+              type: "nested",
+              call_to_actions: [
+                {
+                  title: "Mở Web HA",
+                  type: "web_url",
+                  url: "https://434gp.duckdns.org:8123",
+                  webview_height_ratio: "full"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      get_started: {
+        payload: "GET_STARTED"
       }
-    ],
-    get_started: {
-      payload: "GET_STARTED"
-    }
-  };
+    };
 
-  try {
-    const response = await axios.post(url, payload);
-    console.log("✅ Đã thiết lập persistent menu và nút Bắt đầu.");
-  } catch (error) {
-    console.error("❌ Lỗi setup menu:", error.response?.data || error.message);
-  }
+    request({
+      uri: `https://graph.facebook.com/v18.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`,
+      method: 'POST',
+      json: request_body
+    }, (err, res, body) => {
+      if (!err) {
+        console.log('✅ Đã thiết lập persistent menu và nút Bắt đầu.');
+        resolve();
+      } else {
+        reject(body || err);
+      }
+    });
+  });
 }
 
 module.exports = setupMenu;
