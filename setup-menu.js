@@ -1,10 +1,10 @@
-const request = require('request');
 require('dotenv').config();
+const axios = require('axios');
 
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
-function setupMenu() {
-  return new Promise((resolve, reject) => {
+async function setupMenu() {
+  try {
     const request_body = {
       persistent_menu: [
         {
@@ -46,19 +46,15 @@ function setupMenu() {
       }
     };
 
-    request({
-      uri: `https://graph.facebook.com/v18.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`,
-      method: 'POST',
-      json: request_body
-    }, (err, res, body) => {
-      if (!err) {
-        console.log('✅ Đã thiết lập persistent menu và nút Bắt đầu.');
-        resolve();
-      } else {
-        reject(body || err);
-      }
-    });
-  });
+    const res = await axios.post(
+      `https://graph.facebook.com/v18.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`,
+      request_body
+    );
+
+    console.log('✅ Đã thiết lập persistent menu và nút Bắt đầu.');
+  } catch (err) {
+    console.error('❌ Lỗi setup menu:', err.response?.data || err.message);
+  }
 }
 
 module.exports = setupMenu;
