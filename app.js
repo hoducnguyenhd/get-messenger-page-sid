@@ -1,3 +1,31 @@
+require('dotenv').config();
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const axios = require('axios');
+
+const app = express(); // 🟢 Quan trọng: khởi tạo express app
+app.use(bodyParser.json());
+
+const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
+const HA_WEBHOOK_URL = process.env.HA_WEBHOOK_URL;
+
+// Webhook verification endpoint
+app.get('/webhook', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+
+  if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+    console.log('✅ Webhook verified');
+    res.status(200).send(challenge);
+  } else {
+    res.sendStatus(403);
+  }
+});
+
+// Webhook message handler
 app.post('/webhook', async (req, res) => {
   const body = req.body;
 
@@ -6,18 +34,12 @@ app.post('/webhook', async (req, res) => {
       for (const event of entry.messaging) {
         const sender_psid = event.sender.id;
 
-        // Lấy text từ tin nhắn
         const message_text = event.message?.text || null;
-
-        // Ưu tiên lấy payload từ postback hoặc quick_reply nếu có
         const quick_reply_payload = event.message?.quick_reply?.payload || null;
         const postback_payload = event.postback?.payload || null;
         const payload = postback_payload || quick_reply_payload || null;
-
-        // action_type là title của postback button (nếu có)
         const action_type = event.postback?.title || null;
 
-        // Bỏ qua nếu không có text hoặc payload
         if (!message_text && !payload) {
           console.log(`⚠️ Bỏ qua event không cần thiết từ ${sender_psid}`);
           continue;
@@ -47,3 +69,6 @@ app.post('/webhook', async (req, res) => {
     res.sendStatus(404);
   }
 });
+
+const PORT = process.env.PORT || 1337;
+app.listen(PORT, () => console.log(`🚀 Server đang chạy trên cổng ${PORT}`));
