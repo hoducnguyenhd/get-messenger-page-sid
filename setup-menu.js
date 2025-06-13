@@ -13,7 +13,7 @@ async function setupMenu() {
           call_to_actions: [
             {
               type: "postback",
-              title: "🔌 Điều khiển thiết bị",
+              title: "💡 Điều khiển thiết bị",
               payload: "DIEU_KHIEN"
             },
            {
