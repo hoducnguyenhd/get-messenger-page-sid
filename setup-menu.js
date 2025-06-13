@@ -28,9 +28,10 @@ async function setupMenu() {
               webview_height_ratio: "full"
             },
             {
-              type: "postback",
-              title: "🌦️ Thời tiết hiện tại",
-              payload: "THOI_TIET"
+              title: "🌦️ Thông tin thời tiết",
+              type: "web_url",
+              url: process.env.TT_URL,
+              webview_height_ratio: "full"
             },
             {
               title: "📱 Mở Home Assistant",
