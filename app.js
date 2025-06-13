@@ -11,6 +11,13 @@ const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 const HA_WEBHOOK_URL = process.env.HA_WEBHOOK_URL;
 
+// ✅ CHỈ thiết lập Persistent Menu nếu đang trong môi trường development
+if (process.env.NODE_ENV === 'development') {
+  const setupMenu = require('./setup-menu');
+  setupMenu();
+}
+
+// ✅ Xác minh webhook từ Facebook
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -24,6 +31,7 @@ app.get('/webhook', (req, res) => {
   }
 });
 
+// ✅ Xử lý tin nhắn và postback từ người dùng
 app.post('/webhook', async (req, res) => {
   const body = req.body;
 
@@ -33,26 +41,27 @@ app.post('/webhook', async (req, res) => {
         const sender_psid = event.sender.id;
 
         const message_text = event.message?.text || null;
-        const quick_reply_payload = event.message?.quick_reply?.payload || null;
-        const postback_payload = event.postback?.payload || null;
 
-        const payload = quick_reply_payload || postback_payload || null;
-
-        // Xác định loại hành động: "quick_reply" hoặc "button"
+        // Phân biệt postback vs quick_reply
+        let payload = null;
         let action_type = null;
-        if (quick_reply_payload) {
-          action_type = 'quick_reply';
-        } else if (postback_payload) {
-          action_type = 'button';
+
+        if (event.postback?.payload) {
+          payload = event.postback.payload;
+          action_type = "button";
+        } else if (event.message?.quick_reply?.payload) {
+          payload = event.message.quick_reply.payload;
+          action_type = "quick_reply";
         }
 
+        // Bỏ qua các tin không chứa thông tin cần thiết
         if (!message_text && !payload) {
-          console.log(`⚠️ Bỏ qua event không cần thiết từ ${sender_psid}`);
+          console.log(`⚠️ Bỏ qua event không quan trọng từ ${sender_psid}`);
           continue;
         }
 
         console.log('📩 PSID:', sender_psid);
-        console.log('📝 Tin nhắn:', message_text);
+        console.log('📝 Text:', message_text);
         console.log('📦 Payload:', payload);
         console.log('🔘 Action Type:', action_type);
 
@@ -76,5 +85,6 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
+// ✅ Khởi động server
 const PORT = process.env.PORT || 1337;
 app.listen(PORT, () => console.log(`🚀 Server đang chạy trên cổng ${PORT}`));
