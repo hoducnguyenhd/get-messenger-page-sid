@@ -4,14 +4,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 
-const app = express(); // 🟢 Quan trọng: khởi tạo express app
+const app = express();
 app.use(bodyParser.json());
 
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 const HA_WEBHOOK_URL = process.env.HA_WEBHOOK_URL;
 
-// Webhook verification endpoint
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -25,7 +24,6 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// Webhook message handler
 app.post('/webhook', async (req, res) => {
   const body = req.body;
 
@@ -37,8 +35,16 @@ app.post('/webhook', async (req, res) => {
         const message_text = event.message?.text || null;
         const quick_reply_payload = event.message?.quick_reply?.payload || null;
         const postback_payload = event.postback?.payload || null;
-        const payload = postback_payload || quick_reply_payload || null;
-        const action_type = event.postback?.title || null;
+
+        const payload = quick_reply_payload || postback_payload || null;
+
+        // Xác định loại hành động: "quick_reply" hoặc "button"
+        let action_type = null;
+        if (quick_reply_payload) {
+          action_type = 'quick_reply';
+        } else if (postback_payload) {
+          action_type = 'button';
+        }
 
         if (!message_text && !payload) {
           console.log(`⚠️ Bỏ qua event không cần thiết từ ${sender_psid}`);
