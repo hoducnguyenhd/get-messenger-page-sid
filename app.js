@@ -11,11 +11,15 @@ const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 const HA_WEBHOOK_URL = process.env.HA_WEBHOOK_URL;
 
-// ✅ CHỈ thiết lập Persistent Menu nếu đang trong môi trường development
-if (process.env.NODE_ENV === 'development') {
-  const setupMenu = require('./setup-menu');
-  setupMenu();
-}
+// ✅ Thiết lập Persistent Menu khi khởi động ứng dụng
+const setupMenu = require('./setup-menu');
+setupMenu()
+  .then(() => {
+    console.log('📌 setupMenu() hoàn tất khi khởi động ứng dụng.');
+  })
+  .catch((err) => {
+    console.error('❗ Lỗi khi chạy setupMenu() trong app.js:', err.message);
+  });
 
 // ✅ Xác minh webhook từ Facebook
 app.get('/webhook', (req, res) => {
@@ -39,7 +43,6 @@ app.post('/webhook', async (req, res) => {
     for (const entry of body.entry) {
       for (const event of entry.messaging) {
         const sender_psid = event.sender.id;
-
         const message_text = event.message?.text || null;
 
         // Phân biệt postback vs quick_reply
