@@ -57,9 +57,8 @@ app.post('/webhook', async (req, res) => {
           action_type = "quick_reply";
         }
 
-        // Bỏ qua các tin không chứa thông tin cần thiết
+        // Bỏ qua các tin không chứa thông tin cần thiết (nhưng không ghi log nữa)
         if (!message_text && !payload) {
-          console.log(`⚠️ Bỏ qua event không quan trọng từ ${sender_psid}`);
           continue;
         }
 
@@ -69,7 +68,7 @@ app.post('/webhook', async (req, res) => {
         console.log('🔘 Action Type:', action_type);
 
         try {
-          const response = await axios.post(HA_WEBHOOK_URL, {
+          await axios.post(HA_WEBHOOK_URL, {
             sender_id: sender_psid,
             text: message_text,
             payload: payload,
